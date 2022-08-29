@@ -235,5 +235,88 @@ contract BorrowSystem {
 
     // BORROWER ACTIONS AVAILABLE
 
+function totalLoansBy(address borrower) public view returns (uint256) {
+        return loanMap[borrower].length;
+    }
+
+    function getLoanDetailsByAddressPosition(address borrower, uint256 pos)
+        public
+        view
+        returns (
+            LoanState,
+            uint256,
+            uint256,
+            uint256,
+            uint256,
+            bytes32
+        )
+    {
+        Loan storage obj = loanList[loanMap[borrower][pos]];
+        return (
+            obj.state,
+            obj.dueDate,
+            obj.amount,
+            obj.collected,
+            loanMap[borrower][pos],
+            obj.mortgage
+        );
+    }
+
+    function getLastLoanState(address borrower)
+        public
+        view
+        returns (LoanState)
+    {
+        uint256 loanLength = loanMap[borrower].length;
+        if (loanLength == 0) return LoanState.SUCCESSFUL;
+        return loanList[loanMap[borrower][loanLength - 1]].state;
+    }
+
+    function getLastLoanDetails(address borrower)
+        public
+        view
+        returns (
+            LoanState,
+            uint256,
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        uint256 loanLength = loanMap[borrower].length;
+        Loan storage obj = loanList[loanMap[borrower][loanLength - 1]];
+        return (
+            obj.state,
+            obj.dueDate,
+            obj.amount,
+            obj.proposalCount,
+            obj.collected
+        );
+    }
+
+    function getProposalDetailsByLoanIdPosition(uint256 loanId, uint256 numI)
+        public
+        view
+        returns (
+            ProposalState,
+            uint256,
+            uint256,
+            uint256,
+            address
+        )
+    {
+        Proposal storage obj = proposalList[loanList[loanId].proposal[numI]];
+        return (
+            obj.state,
+            obj.rate,
+            obj.amount,
+            loanList[loanId].proposal[numI],
+            obj.lender
+        );
+    }
+
+    function numTotalLoans() public view returns (uint256) {
+        return loanList.length;
+    }
     
 }
